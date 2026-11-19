@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { CheckCircle2, ShoppingBag, Truck, ArrowLeft } from "lucide-react";
+import { CheckCircle2, ShoppingBag, Truck, ArrowLeft, PackageCheck } from "lucide-react";
 import { formatINR } from "../utils/formatters";
 
 /**
- * OrderConfirmed component displaying live 12-minute countdown timer
- * and itemized order receipt after successful checkout.
+ * OrderConfirmed component displaying live countdown timer
+ * (10s demo timer) and itemized order receipt after successful checkout.
  */
 export default function OrderConfirmed({ orderSummary }) {
-  const [secondsLeft, setSecondsLeft] = useState(12 * 60); // 12-minute delivery countdown
+  const [secondsLeft, setSecondsLeft] = useState(10); // 10-second fast demo countdown
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -26,29 +26,41 @@ export default function OrderConfirmed({ orderSummary }) {
 
   const mins = Math.floor(secondsLeft / 60);
   const secs = secondsLeft % 60;
+  const isDelivered = secondsLeft === 0;
 
   return (
     <main className="max-w-lg mx-auto px-4 sm:px-6 py-12 text-center">
       {/* Animated Success Badge */}
       <div className="w-20 h-20 mx-auto bg-emerald-100 rounded-full flex items-center justify-center mb-6 animate-[scaleIn_0.4s_ease-out]">
-        <CheckCircle2 className="w-10 h-10 text-emerald-600" />
+        {isDelivered ? (
+          <PackageCheck className="w-10 h-10 text-emerald-600 animate-bounce" />
+        ) : (
+          <CheckCircle2 className="w-10 h-10 text-emerald-600" />
+        )}
       </div>
 
       <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-2">
-        Order Confirmed! 🎉
+        {isDelivered ? "Order Delivered! 🎊" : "Order Confirmed! 🎉"}
       </h1>
       <p className="text-gray-500 text-sm mb-8">
-        Your groceries are being packed and will arrive shortly.
+        {isDelivered
+          ? "Your groceries have been delivered to your doorstep. Enjoy!"
+          : "Your groceries are being packed and will arrive shortly."}
       </p>
 
-      {/* 12-Minute Countdown Timer */}
+      {/* 10-Second Countdown Timer & Delivery Status */}
       <div className="bg-emerald-50 rounded-2xl p-6 mb-8 border border-emerald-100 shadow-sm">
         <div className="flex items-center justify-center gap-2 mb-3">
-          <Truck className="w-5 h-5 text-emerald-600 animate-pulse" />
+          <Truck
+            className={`w-5 h-5 text-emerald-600 ${
+              !isDelivered ? "animate-pulse" : ""
+            }`}
+          />
           <span className="text-sm font-semibold text-emerald-800">
-            Estimated Delivery Time
+            {isDelivered ? "Delivery Status" : "Estimated Delivery Time"}
           </span>
         </div>
+
         <div className="flex items-center justify-center gap-3">
           <div className="bg-white rounded-xl px-4 py-3 shadow-sm min-w-[72px] border border-emerald-100">
             <span className="text-3xl font-extrabold text-emerald-700 tabular-nums">
@@ -58,7 +70,11 @@ export default function OrderConfirmed({ orderSummary }) {
               MINS
             </p>
           </div>
-          <span className="text-2xl font-bold text-emerald-400 animate-pulse">
+          <span
+            className={`text-2xl font-bold text-emerald-400 ${
+              !isDelivered ? "animate-pulse" : ""
+            }`}
+          >
             :
           </span>
           <div className="bg-white rounded-xl px-4 py-3 shadow-sm min-w-[72px] border border-emerald-100">
@@ -70,10 +86,14 @@ export default function OrderConfirmed({ orderSummary }) {
             </p>
           </div>
         </div>
-        {secondsLeft === 0 ? (
-          <p className="text-sm font-bold text-emerald-700 mt-3 animate-bounce">
-            🎊 Your SwiftBasket rider has arrived!
-          </p>
+
+        {/* Live Status Message */}
+        {isDelivered ? (
+          <div className="mt-3 py-1 px-3 bg-emerald-100/80 rounded-xl inline-block border border-emerald-200">
+            <p className="text-sm sm:text-base font-extrabold text-emerald-800">
+              🎉 Order Delivered!
+            </p>
+          </div>
         ) : (
           <p className="text-xs text-emerald-600 font-medium mt-3">
             Rider assigned • On the fastest route to your doorstep
