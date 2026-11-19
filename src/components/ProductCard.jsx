@@ -1,16 +1,25 @@
+import { useNavigate } from "react-router-dom";
 import { Plus, Minus, Star } from "lucide-react";
 import { useCart, USD_TO_INR } from "../context/CartContext";
 
 export default function ProductCard({ product }) {
   const { items, addToCart, incrementQty, decrementQty } = useCart();
+  const navigate = useNavigate();
   const inCart = items.find((i) => i.id === product.id);
   const priceINR = Math.round(product.price * USD_TO_INR);
   const originalINR = product.discountPercentage
     ? Math.round(priceINR / (1 - product.discountPercentage / 100))
     : null;
 
+  const handleCardClick = () => {
+    navigate(`/product/${product.id}`);
+  };
+
   return (
-    <div className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:border-emerald-100 transition-all duration-300 overflow-hidden flex flex-col">
+    <div
+      onClick={handleCardClick}
+      className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:border-emerald-100 transition-all duration-300 overflow-hidden flex flex-col cursor-pointer"
+    >
       {/* Image */}
       <div className="relative bg-gray-50 p-4 flex items-center justify-center h-44 sm:h-48 overflow-hidden">
         <img
@@ -54,8 +63,11 @@ export default function ProductCard({ product }) {
             )}
           </div>
 
-          {/* ADD button ↔ Qty stepper with smooth transition */}
-          <div className="relative h-8 min-w-[72px] flex items-center justify-end">
+          {/* ADD button ↔ Qty stepper — stopPropagation prevents card navigation */}
+          <div
+            className="relative h-8 min-w-[72px] flex items-center justify-end"
+            onClick={(e) => e.stopPropagation()}
+          >
             {!inCart ? (
               <button
                 onClick={() => addToCart(product)}

@@ -1,7 +1,10 @@
 import { useState, useCallback } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CartProvider } from "./context/CartContext";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
+import ProductDetails from "./pages/ProductDetails";
+import Checkout from "./pages/Checkout";
 import CartDrawer from "./components/CartDrawer";
 
 export default function App() {
@@ -12,16 +15,22 @@ export default function App() {
   const closeCart = useCallback(() => setCartOpen(false), []);
 
   return (
-    <CartProvider>
-      <div className="min-h-screen bg-gray-50/50 font-sans antialiased">
-        <Navbar
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          onCartClick={openCart}
-        />
-        <Home searchQuery={searchQuery} />
-        <CartDrawer open={cartOpen} onClose={closeCart} />
-      </div>
-    </CartProvider>
+    <BrowserRouter>
+      <CartProvider>
+        <div className="min-h-screen bg-gray-50/50 font-sans antialiased">
+          <Navbar
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            onCartClick={openCart}
+          />
+          <Routes>
+            <Route path="/" element={<Home searchQuery={searchQuery} />} />
+            <Route path="/product/:id" element={<ProductDetails />} />
+            <Route path="/checkout" element={<Checkout />} />
+          </Routes>
+          <CartDrawer open={cartOpen} onClose={closeCart} />
+        </div>
+      </CartProvider>
+    </BrowserRouter>
   );
 }

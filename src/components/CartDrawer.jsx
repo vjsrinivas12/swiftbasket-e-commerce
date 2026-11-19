@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   X,
   Minus,
@@ -32,6 +33,7 @@ export default function CartDrawer({ open, onClose }) {
   } = useCart();
 
   const [couponInput, setCouponInput] = useState("");
+  const navigate = useNavigate();
 
   // Lock body scroll when drawer is open
   useEffect(() => {
@@ -289,7 +291,13 @@ export default function CartDrawer({ open, onClose }) {
               </div>
 
               {/* CTA */}
-              <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 rounded-xl font-bold text-sm transition-colors cursor-pointer shadow-lg shadow-emerald-200">
+              <button
+                onClick={() => {
+                  onClose();
+                  navigate("/checkout");
+                }}
+                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 rounded-xl font-bold text-sm transition-colors cursor-pointer shadow-lg shadow-emerald-200"
+              >
                 Proceed to Checkout — ₹{grandTotal.toLocaleString("en-IN")}
               </button>
 
