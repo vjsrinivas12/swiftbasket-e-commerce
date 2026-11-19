@@ -9,8 +9,8 @@ import {
 } from "lucide-react";
 import { useCart } from "../context/CartContext";
 
-export default function Navbar({ searchQuery, setSearchQuery }) {
-  const { totalItems, totalPrice } = useCart();
+export default function Navbar({ searchQuery, setSearchQuery, onCartClick }) {
+  const { totalItems, grandTotal } = useCart();
   const [showPinModal, setShowPinModal] = useState(false);
   const [pincode, setPincode] = useState("400001");
   const [tempPin, setTempPin] = useState("400001");
@@ -98,12 +98,15 @@ export default function Navbar({ searchQuery, setSearchQuery }) {
             </div>
 
             {/* Cart Button */}
-            <button className="relative flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-md shadow-emerald-200 cursor-pointer shrink-0">
+            <button
+              onClick={onCartClick}
+              className="relative flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-md shadow-emerald-200 cursor-pointer shrink-0"
+            >
               <ShoppingCart className="w-5 h-5" />
               {totalItems > 0 && (
                 <>
                   <span className="hidden sm:inline">
-                    ₹{totalPrice.toLocaleString("en-IN")}
+                    ₹{grandTotal.toLocaleString("en-IN")}
                   </span>
                   <span className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center ring-2 ring-white animate-bounce">
                     {totalItems}

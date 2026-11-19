@@ -1,10 +1,8 @@
 import { Plus, Minus, Star } from "lucide-react";
-import { useCart } from "../context/CartContext";
-
-const USD_TO_INR = 85;
+import { useCart, USD_TO_INR } from "../context/CartContext";
 
 export default function ProductCard({ product }) {
-  const { items, addToCart, removeFromCart } = useCart();
+  const { items, addToCart, incrementQty, decrementQty } = useCart();
   const inCart = items.find((i) => i.id === product.id);
   const priceINR = Math.round(product.price * USD_TO_INR);
   const originalINR = product.discountPercentage
@@ -56,34 +54,38 @@ export default function ProductCard({ product }) {
             )}
           </div>
 
-          {/* Add / Qty stepper */}
-          {!inCart ? (
-            <button
-              onClick={() => addToCart(product)}
-              className="flex items-center gap-1 bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white border border-emerald-200 hover:border-emerald-600 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              ADD
-            </button>
-          ) : (
-            <div className="flex items-center gap-1 bg-emerald-600 rounded-lg overflow-hidden shadow-md">
-              <button
-                onClick={() => removeFromCart(product.id)}
-                className="p-1.5 hover:bg-emerald-700 text-white transition cursor-pointer"
-              >
-                <Minus className="w-3.5 h-3.5" />
-              </button>
-              <span className="px-2 text-sm font-bold text-white min-w-[20px] text-center">
-                {inCart.qty}
-              </span>
+          {/* ADD button ↔ Qty stepper with smooth transition */}
+          <div className="relative h-8 min-w-[72px] flex items-center justify-end">
+            {!inCart ? (
               <button
                 onClick={() => addToCart(product)}
-                className="p-1.5 hover:bg-emerald-700 text-white transition cursor-pointer"
+                className="flex items-center gap-1 bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white border border-emerald-200 hover:border-emerald-600 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 cursor-pointer animate-[fadeIn_0.15s_ease-out]"
               >
                 <Plus className="w-3.5 h-3.5" />
+                ADD
               </button>
-            </div>
-          )}
+            ) : (
+              <div className="flex items-center bg-emerald-600 rounded-lg overflow-hidden shadow-md animate-[scaleIn_0.2s_ease-out]">
+                <button
+                  onClick={() => decrementQty(product.id)}
+                  className="p-1.5 hover:bg-emerald-700 text-white transition cursor-pointer"
+                  aria-label="Decrease quantity"
+                >
+                  <Minus className="w-3.5 h-3.5" />
+                </button>
+                <span className="px-2.5 text-sm font-bold text-white min-w-[24px] text-center tabular-nums">
+                  {inCart.qty}
+                </span>
+                <button
+                  onClick={() => incrementQty(product.id)}
+                  className="p-1.5 hover:bg-emerald-700 text-white transition cursor-pointer"
+                  aria-label="Increase quantity"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
