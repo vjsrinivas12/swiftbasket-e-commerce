@@ -6,18 +6,18 @@ import {
   useEffect,
 } from "react";
 import useLocalStorage from "../hooks/useLocalStorage";
+import {
+  USD_TO_INR,
+  FREE_DELIVERY_THRESHOLD,
+  DELIVERY_FEE,
+  HANDLING_CHARGE,
+  COUPONS,
+} from "../utils/constants";
+import { convertToINR } from "../utils/formatters";
 
 const CartContext = createContext();
 
-export const USD_TO_INR = 85;
-const FREE_DELIVERY_THRESHOLD = 499;
-const DELIVERY_FEE = 30;
-const HANDLING_CHARGE = 5;
-
-/* ── Coupon definitions ── */
-const COUPONS = {
-  SAVE10: { type: "percent", value: 10, label: "10% off" },
-};
+export { USD_TO_INR };
 
 /* ── Reducer ── */
 function cartReducer(state, action) {
@@ -50,7 +50,10 @@ function cartReducer(state, action) {
       const item = state.items.find((i) => i.id === action.id);
       if (!item) return state;
       if (item.qty === 1) {
-        return { ...state, items: state.items.filter((i) => i.id !== action.id) };
+        return {
+          ...state,
+          items: state.items.filter((i) => i.id !== action.id),
+        };
       }
       return {
         ...state,
@@ -69,7 +72,8 @@ function cartReducer(state, action) {
     case "APPLY_COUPON": {
       const code = action.code.toUpperCase().trim();
       const coupon = COUPONS[code];
-      if (!coupon) return { ...state, coupon: null, couponError: "Invalid coupon code" };
+      if (!coupon)
+        return { ...state, coupon: null, couponError: "Invalid coupon code" };
       return { ...state, coupon: { code, ...coupon }, couponError: null };
     }
 
@@ -101,7 +105,7 @@ export function CartProvider({ children }) {
     items: persisted,
   });
 
-  // Persist items to localStorage on every change
+  // Persist items to localStorage on state changes
   useEffect(() => {
     setPersisted(state.items);
   }, [state.items, setPersisted]);
@@ -139,7 +143,7 @@ export function CartProvider({ children }) {
   /* ── Computed values ── */
   const totalItems = state.items.reduce((sum, i) => sum + i.qty, 0);
   const itemTotal = state.items.reduce(
-    (sum, i) => sum + Math.round(i.price * USD_TO_INR) * i.qty,
+    (sum, i) => sum + convertToINR(i.price) * i.qty,
     0
   );
   const deliveryFee = itemTotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_FEE;
